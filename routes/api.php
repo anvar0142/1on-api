@@ -3,7 +3,6 @@
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\EmployeeServiceController;
-use App\Http\Controllers\GoogleAuthController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\organization\OrganizationBranchController;
 use App\Http\Controllers\organization\OrganizationController;
@@ -28,12 +27,8 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 });
 
 Route::post('auth/login', [AuthController::class, 'login'])->name('login');
+Route::post('auth/google', [AuthController::class, 'google'])->name('google');
 Route::get('auth/get-otp/{phone}', [AuthController::class, 'getOtp']);
-
-Route::group(['middleware' => ['web']], function () {
-    Route::get('auth/google', [GoogleAuthController::class, 'redirect'])->name('google-auth');
-    Route::get('auth/google/callback', [GoogleAuthController::class, 'callback']);
-});
 
 Route::group(['prefix' => 'auth', 'middleware' => 'auth:employee, auth:client'], function () {
     Route::get('profile', [AuthController::class, 'getProfile']);

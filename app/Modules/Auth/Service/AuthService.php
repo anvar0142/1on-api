@@ -4,6 +4,7 @@ namespace App\Modules\Auth\Service;
 
 use App\Models\Organization\Employee\Employee;
 use App\Models\Otp;
+use App\Models\User;
 use App\Modules\Auth\Dto\LoginDto;
 use App\Modules\Auth\Enum\UserType;
 use Illuminate\Http\JsonResponse;
@@ -18,6 +19,24 @@ class AuthService
         if (!$token = auth("$guard")->attempt($credentials)) {
             return response()->json(['error' => 'Unauthorized - Wrong User Type'], 401);
         }
+        return $this->respondWithToken($token, $guard);
+    }
+
+    public function google($dto)
+    {
+        $user = User::where('email', $dto->email)->first();
+
+        if (!$user) {
+            User::create([
+                'email' => $dto->email,
+                'name' => $dto->name,
+            ]);
+        }
+
+        $credentials = ['username' => $dto->email, 'password' => ''];
+        $guard = $dto->is_client === true ? UserType::CLIENT->value : UserType::EMPLOYEE->value;
+        $token = auth("$guard")->attempt($credentials);
+
         return $this->respondWithToken($token, $guard);
     }
 

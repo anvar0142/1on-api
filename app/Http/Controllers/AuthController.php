@@ -6,6 +6,7 @@ use App\Modules\Auth\Dto\LoginDto;
 use App\Modules\Auth\Request\GoogleLoginRequest;
 use App\Modules\Auth\Request\LoginRequest;
 use App\Modules\Auth\Request\LogoutRequest;
+use App\Modules\Auth\Request\RefreshRequest;
 use App\Modules\Auth\Service\AuthService;
 use Illuminate\Http\Request;
 
@@ -25,6 +26,11 @@ class AuthController extends Controller
     public function google(GoogleLoginRequest $request)
     {
         return $this->loginService->google($request);
+    }
+
+    public function refresh(RefreshRequest $request)
+    {
+        return $this->loginService->refresh($request);
     }
 
     public function logout(LogoutRequest $request)

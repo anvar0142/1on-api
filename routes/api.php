@@ -33,6 +33,7 @@ Route::get('auth/get-otp/{phone}', [AuthController::class, 'getOtp']);
 Route::group(['prefix' => 'auth', 'middleware' => 'auth:employee, auth:client'], function () {
     Route::get('profile', [AuthController::class, 'getProfile']);
     Route::post('logout', [AuthController::class, 'logout']);
+    Route::get('refresh', [AuthController::class, 'refresh']);
 });
 
 Route::group(['middleware' => ['auth:employee']], function () {

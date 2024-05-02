@@ -4,7 +4,7 @@ namespace App\Modules\Auth\Request;
 
 use App\Modules\BusinessDashboard\Core\Request\BaseTenantRequest;
 
-class GoogleLoginRequest extends BaseTenantRequest
+class RefreshRequest extends BaseTenantRequest
 {
     public function authorize()
     {
@@ -14,9 +14,7 @@ class GoogleLoginRequest extends BaseTenantRequest
     public function rules()
     {
         return [
-            'email' => 'required',
-            'name' => 'required',
-            'is_client' => 'required',
+            'is_client' => 'bool'
         ];
     }
 }

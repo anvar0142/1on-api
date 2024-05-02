@@ -2,6 +2,7 @@
 
 namespace App\Modules\Auth\Service;
 
+use App\Models\Client;
 use App\Models\Organization\Employee\Employee;
 use App\Models\Otp;
 use App\Models\User;
@@ -9,6 +10,7 @@ use App\Modules\Auth\Dto\LoginDto;
 use App\Modules\Auth\Enum\UserType;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 
 class AuthService
 {
@@ -24,17 +26,31 @@ class AuthService
 
     public function google($dto)
     {
-        $user = User::where('email', $dto->email)->first();
+        if ($dto->is_client) {
+            $user = Client::query()->where('email', $dto->email)->first();
+            if (!$user) {
+                $user = Client::create([
+                    'email' => $dto->email,
+                    'full_name' => $dto->name,
+                    'username' => $dto->email,
+                    'password' => Hash::make('password')
+                ]);
+            }
+        } else {
+            $user = User::query()->where('email', $dto->email)->first();
 
-        if (!$user) {
-            User::create([
-                'email' => $dto->email,
-                'name' => $dto->name,
-            ]);
+            if (!$user) {
+                $user = User::query()->create([
+                    'email' => $dto->email,
+                    'username' => $dto->email,
+                    'name' => $dto->name,
+                    'password' => Hash::make('password')
+                ])->first();
+            }
         }
 
-        $credentials = ['username' => $dto->email, 'password' => ''];
-        $guard = $dto->is_client === true ? UserType::CLIENT->value : UserType::EMPLOYEE->value;
+        $credentials = ['username' => $user->username, 'password' => $user->password];
+        $guard = $dto->is_client ? UserType::CLIENT->value : UserType::EMPLOYEE->value;
         $token = auth("$guard")->attempt($credentials);
 
         return $this->respondWithToken($token, $guard);
@@ -44,6 +60,12 @@ class AuthService
     {
         $guard = $request['is_client'] === true ? UserType::CLIENT->value : UserType::EMPLOYEE->value;
         auth("$guard")->logout();
+    }
+
+    public function refresh($request)
+    {
+        $guard = $request->is_client ? UserType::CLIENT->value : UserType::EMPLOYEE->value;
+        return $this->respondWithToken(auth($guard)->refresh());
     }
 
     protected function respondWithToken($token, $guard): JsonResponse

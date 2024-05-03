@@ -14,8 +14,7 @@ class GoogleLoginRequest extends BaseTenantRequest
     public function rules()
     {
         return [
-            'email' => 'required',
-            'name' => 'required',
+            'code' => 'required',
             'is_client' => 'required',
         ];
     }

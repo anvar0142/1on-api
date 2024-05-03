@@ -10,8 +10,7 @@ class GoogleLoginDto
 
     public function __construct($request)
     {
-        $this->name = $request['name'];
-        $this->email = $request['email'];
+        $this->code = $request['code'];
         $this->is_client = $request['is_client'] ?? false;
     }
 }

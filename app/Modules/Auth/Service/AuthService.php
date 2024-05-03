@@ -41,7 +41,7 @@ class AuthService
             'Content-Type' => 'application/json',
         ])->post('https://accounts.google.com/o/oauth2/token', [
             'grant_type' => "authorization_code",
-            'code' => $dto->name,
+            'code' => $dto->code,
             'client_id' => env('GOOGLE_CLIENT_ID'),
             'client_secret' => env('GOOGLE_CLIENT_SECRET'),
             'redirect_uri'=> env('GOOGLE_REDIRECT'),

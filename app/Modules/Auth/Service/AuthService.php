@@ -6,14 +6,25 @@ use App\Models\Client;
 use App\Models\Organization\Employee\Employee;
 use App\Models\Otp;
 use App\Models\User;
+use App\Modules\Auth\Dto\GoogleLoginDto;
 use App\Modules\Auth\Dto\LoginDto;
 use App\Modules\Auth\Enum\UserType;
+use App\Modules\BusinessDashboard\Employee\Dto\CreateEmployeeDto;
+use App\Modules\Client\Dto\CreateClientDto;
+use App\Modules\Client\Service\ClientService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Http;
+use Nette\Utils\Random;
+use Tymon\JWTAuth\Facades\JWTAuth;
 
 class AuthService
 {
+    public function __construct(protected ClientService $clientService)
+    {
+    }
+
     public function login(LoginDto $dto): JsonResponse
     {
         $credentials = ['username' => $dto->username, 'password' => $dto->password];
@@ -24,34 +35,45 @@ class AuthService
         return $this->respondWithToken($token, $guard);
     }
 
-    public function google($dto)
+    public function google(GoogleLoginDto $dto)
     {
+        $response = Http::withHeaders([
+            'Content-Type' => 'application/json',
+        ])->post('https://accounts.google.com/o/oauth2/token', [
+            'grant_type' => "authorization_code",
+            'code' => $dto->name,
+            'client_id' => env('GOOGLE_CLIENT_ID'),
+            'client_secret' => env('GOOGLE_CLIENT_SECRET'),
+            'redirect_uri'=> env('GOOGLE_REDIRECT'),
+        ]);
+
+        $data = $response->json();
+
+        if (!$data['access_token']) {
+            return response()->json(['error' => 'Unauthorized - Wrong User Type'], 401);
+        }
+
+        $userData = Http::withHeaders([
+            'Authorization' => 'Bearer ' . $data['access_token'],
+        ])->get('https://www.googleapis.com/oauth2/v3/userinfo')->json();
+
         if ($dto->is_client) {
-            $user = Client::query()->where('email', $dto->email)->first();
-            if (!$user) {
-                $user = Client::create([
-                    'email' => $dto->email,
-                    'full_name' => $dto->name,
-                    'username' => $dto->email,
-                    'password' => Hash::make('password')
-                ]);
-            }
-        } else {
-            $user = User::query()->where('email', $dto->email)->first();
+            $user = Client::query()->where('email', $userData['email'])->first();
 
             if (!$user) {
-                $user = User::query()->create([
-                    'email' => $dto->email,
-                    'username' => $dto->email,
-                    'name' => $dto->name,
-                    'password' => Hash::make('password')
-                ])->first();
+                $createClientDto = new CreateClientDto($userData);
+                $user = $this->clientService->create($createClientDto);
+            }
+        } else {
+            $user = Employee::query()->where('email', $userData['email'])->first();
+
+            if (!$user) {
+                return response()->json(['error' => 'Unauthorized - Wrong User Type'], 401);
             }
         }
 
-        $credentials = ['username' => $user->username, 'password' => $user->password];
         $guard = $dto->is_client ? UserType::CLIENT->value : UserType::EMPLOYEE->value;
-        $token = auth("$guard")->attempt($credentials);
+        $token = JWTAuth::fromUser($user);
 
         return $this->respondWithToken($token, $guard);
     }

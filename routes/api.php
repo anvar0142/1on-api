@@ -25,10 +25,11 @@ use Illuminate\Support\Facades\Route;
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
-
-Route::post('auth/login', [AuthController::class, 'login'])->name('login');
-Route::post('auth/google', [AuthController::class, 'google'])->name('google');
-Route::get('auth/get-otp/{phone}', [AuthController::class, 'getOtp']);
+Route::group(['prefix' => 'auth'], function () {
+    Route::post('login', [AuthController::class, 'login'])->name('login');
+    Route::post('google', [AuthController::class, 'google'])->name('google');
+    Route::get('get-otp/{phone}', [AuthController::class, 'getOtp']);
+});
 
 Route::group(['prefix' => 'auth', 'middleware' => 'auth:employee, auth:client'], function () {
     Route::get('profile', [AuthController::class, 'getProfile']);

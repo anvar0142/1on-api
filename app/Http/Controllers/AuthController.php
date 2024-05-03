@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Modules\Auth\Dto\GoogleLoginDto;
 use App\Modules\Auth\Dto\LoginDto;
 use App\Modules\Auth\Request\GoogleLoginRequest;
 use App\Modules\Auth\Request\LoginRequest;
@@ -25,7 +26,8 @@ class AuthController extends Controller
 
     public function google(GoogleLoginRequest $request)
     {
-        return $this->loginService->google($request);
+        $googleLoginDto = new GoogleLoginDto($request->validated());
+        return $this->loginService->google($googleLoginDto);
     }
 
     public function refresh(RefreshRequest $request)

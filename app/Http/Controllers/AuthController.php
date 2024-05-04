@@ -15,7 +15,7 @@ class AuthController extends Controller
 {
     public function __construct(protected AuthService $loginService)
     {
-        $this->middleware(['jwt.auth'])->except('login', 'google');
+        $this->middleware(['jwt.auth'])->except('login', 'google', 'refresh');
     }
 
     public function login(LoginRequest $request)

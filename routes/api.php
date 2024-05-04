@@ -34,7 +34,7 @@ Route::group(['prefix' => 'auth'], function () {
 Route::group(['prefix' => 'auth', 'middleware' => 'auth:employee, auth:client'], function () {
     Route::get('profile', [AuthController::class, 'getProfile']);
     Route::post('logout', [AuthController::class, 'logout']);
-    Route::get('refresh', [AuthController::class, 'refresh']);
+    Route::post('refresh', [AuthController::class, 'refresh']);
 });
 
 Route::group(['middleware' => ['auth:employee']], function () {

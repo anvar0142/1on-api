@@ -86,8 +86,9 @@ class AuthService
 
     public function refresh($request)
     {
+        $token = JWTAuth::getToken();
         $guard = $request->is_client ? UserType::CLIENT->value : UserType::EMPLOYEE->value;
-        return $this->respondWithToken(auth($guard)->refresh());
+        return $this->respondWithToken(auth($guard)->refresh($token), $guard);
     }
 
     protected function respondWithToken($token, $guard): JsonResponse

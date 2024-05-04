@@ -80,8 +80,10 @@ class AuthService
 
     public function logout($request): void
     {
-        $guard = $request['is_client'] === true ? UserType::CLIENT->value : UserType::EMPLOYEE->value;
-        auth("$guard")->logout();
+        $token = JWTAuth::getToken();
+//        $guard = $request->is_client === true ? UserType::CLIENT->value : UserType::EMPLOYEE->value;
+        JWTAuth::invalidate($token);
+//        auth("$guard")->logout();
     }
 
     public function refresh($request)

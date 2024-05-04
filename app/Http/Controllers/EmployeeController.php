@@ -62,7 +62,7 @@ class EmployeeController extends Controller
     public function destroy($id, Employee $employee)
     {
         $this->service->delete($employee);
-        return response()->json(null, Response::HTTP_NO_CONTENT);
+        return response()->json('Deleted successfully', Response::HTTP_OK);
     }
 
     public function getTimeSlots(Organization $organization, Employee $employee, GetTimeSlotsRequest $request)

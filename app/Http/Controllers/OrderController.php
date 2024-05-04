@@ -59,9 +59,10 @@ class OrderController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(string $id, Order $order)
     {
-        //
+        $this->service->delete($order);
+        return response()->json('Deleted successfully', Response::HTTP_OK);
     }
 
     public function changeStatus(ChangeOrderStatusRequest $request)

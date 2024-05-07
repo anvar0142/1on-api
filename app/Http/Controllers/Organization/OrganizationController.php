@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\Organization;
 
 use App\Http\Controllers\Controller;
-use App\Models\Organization\Employee\Employee;
 use App\Models\Organization\Organization;
 use App\Modules\BusinessDashboard\Organization\Dto\CreateOrganizationDto;
 use App\Modules\BusinessDashboard\Organization\Dto\UpdateOrganizationDto;
@@ -19,6 +18,12 @@ class OrganizationController extends Controller
 
     public function __construct(protected ClientService $clientService)
     {
+    }
+
+    public function initOrganization(): JsonResponse
+    {
+        $domain = request()->getHost();
+        return response()->json(Organization::where('domain', $domain)->first());
     }
 
     public function index(): JsonResponse

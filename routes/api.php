@@ -49,6 +49,7 @@ Route::group(['middleware' => ['auth:employee']], function () {
 
 Route::post('organization/{organization}/employee/{employee}/time-slots', [EmployeeController::class, 'getTimeSlots']);
 Route::any('telegram', [TelegramBotController::class, 'webhook']);
+Route::get('init-organization', [OrganizationController::class, 'initOrganization']);
 
 
 

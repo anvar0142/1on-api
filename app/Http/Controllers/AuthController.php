@@ -2,9 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Modules\Auth\Dto\GoogleLoginDto;
 use App\Modules\Auth\Dto\LoginDto;
+use App\Modules\Auth\Request\GoogleLoginRequest;
 use App\Modules\Auth\Request\LoginRequest;
 use App\Modules\Auth\Request\LogoutRequest;
+use App\Modules\Auth\Request\RefreshRequest;
 use App\Modules\Auth\Service\AuthService;
 use Illuminate\Http\Request;
 
@@ -12,13 +15,24 @@ class AuthController extends Controller
 {
     public function __construct(protected AuthService $loginService)
     {
-        $this->middleware(['jwt.auth'])->except('login');
+        $this->middleware(['jwt.auth'])->except('login', 'google', 'refresh');
     }
 
     public function login(LoginRequest $request)
     {
         $loginDto = new LoginDto($request->validated());
         return $this->loginService->login($loginDto);
+    }
+
+    public function google(GoogleLoginRequest $request)
+    {
+        $googleLoginDto = new GoogleLoginDto($request->validated());
+        return $this->loginService->google($googleLoginDto);
+    }
+
+    public function refresh(RefreshRequest $request)
+    {
+        return $this->loginService->refresh($request);
     }
 
     public function logout(LogoutRequest $request)

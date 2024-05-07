@@ -54,8 +54,9 @@ class OrganizationServiceController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(string $id, OrganizationService $service)
     {
-        //
+        $this->service->delete($service);
+        return response()->json('Deleted successfully', Response::HTTP_OK);
     }
 }

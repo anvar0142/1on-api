@@ -23,7 +23,13 @@ class OrganizationController extends Controller
     public function initOrganization(): JsonResponse
     {
         $domain = request()->getHost();
-        return response()->json(Organization::where('domain', $domain)->first());
+        $organization = Organization::where('domain', $domain)->first();
+
+        if (!$organization) {
+            return response()->json(['error' => 'Organization not found'], ResponseAlias::HTTP_NOT_FOUND);
+        }
+
+        return response()->json($organization, ResponseAlias::HTTP_OK);
     }
 
     public function index(): JsonResponse

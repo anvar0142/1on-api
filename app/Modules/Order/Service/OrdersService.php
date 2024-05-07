@@ -83,4 +83,9 @@ class OrdersService
     {
         return Order::query()->where(['organization_id' => $organization_id])->with(['client', 'employee'])->get();
     }
+
+    public function delete(Order $order)
+    {
+        $order->delete();
+    }
 }

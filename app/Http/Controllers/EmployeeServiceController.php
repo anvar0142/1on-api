@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Organization\Employee\EmployeeService;
+use App\Models\Organization\OrganizationService;
 use App\Modules\BusinessDashboard\EmployeeService\Dto\CreateEmployeeServiceDto;
 use App\Modules\BusinessDashboard\EmployeeService\Dto\UpdateEmployeeServiceDto;
 use App\Modules\BusinessDashboard\EmployeeService\Request\StoreEmployeeServiceRequest;
@@ -31,8 +32,15 @@ class EmployeeServiceController extends Controller
     public function store(StoreEmployeeServiceRequest $request)
     {
         $dto = new CreateEmployeeServiceDto($request->validated());
-        $service = $this->service->create($dto);
-        return response()->json($service, Response::HTTP_CREATED);
+        $organization_service = OrganizationService::where('id', $dto->service_id)->first();
+
+        if (!$organization_service) {
+            return response()->json(['error' => 'There is no service with this id'], Response::HTTP_BAD_REQUEST);
+        }
+
+        $dto->name = $organization_service->name;
+        $employee_service = $this->service->create($dto);
+        return response()->json($employee_service, Response::HTTP_CREATED);
     }
 
     /**

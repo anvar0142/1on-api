@@ -15,6 +15,7 @@ class EmployeeServices
         $employeeService->employee_id = $dto->employee_id;
         $employeeService->service_id = $dto->service_id;
         $employeeService->price = $dto->price;
+        $employeeService->name = $dto->name;
         $employeeService->time = $dto->time;
         $employeeService->save();
 

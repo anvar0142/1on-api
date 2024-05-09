@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property int|mixed $employee_id
  * @property int|mixed $service_id
  * @property int|mixed $price
+ * @property mixed|string $name
  * @property int|mixed $time
  */
 class EmployeeService extends Model

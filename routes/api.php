@@ -28,6 +28,7 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 Route::group(['prefix' => 'auth'], function () {
     Route::post('login', [AuthController::class, 'login'])->name('login');
     Route::post('google', [AuthController::class, 'google'])->name('google');
+    Route::post('set-phone', [AuthController::class, 'setPhone'])->name('setPhone');
     Route::get('get-otp/{phone}', [AuthController::class, 'getOtp']);
 });
 

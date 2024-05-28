@@ -35,6 +35,19 @@ class AuthService
         return $this->respondWithToken($token, $guard);
     }
 
+    public function setPhone($dto): JsonResponse
+    {
+        $user = Client::query()->where('email', $dto['email'])->first();
+        if (!$user) {
+            return response()->json(['error' => 'Unauthorized - Wrong User Type'], 401);
+        }
+
+        $user->phone = $dto['phone'];
+        $user->save();
+
+        return response()->json(['Success' => 'Phone has been set'], 200);
+    }
+
     public function google(GoogleLoginDto $dto)
     {
         $response = Http::withHeaders([
@@ -75,7 +88,7 @@ class AuthService
         $guard = $dto->is_client ? UserType::CLIENT->value : UserType::EMPLOYEE->value;
         $token = JWTAuth::fromUser($user);
 
-        return $this->respondWithToken($token, $guard);
+        return $this->respondWithToken($token, $guard, $user);
     }
 
     public function logout($request): void
@@ -93,12 +106,13 @@ class AuthService
         return $this->respondWithToken(auth($guard)->refresh($token), $guard);
     }
 
-    protected function respondWithToken($token, $guard): JsonResponse
+    protected function respondWithToken($token, $guard, $user): JsonResponse
     {
         return response()->json([
             'access_token' => $token,
             'token_type' => 'bearer',
-            'expires_in' => Auth::guard($guard)->factory()->getTTL() * 60
+            'expires_in' => Auth::guard($guard)->factory()->getTTL() * 60,
+            'user' => $user
         ]);
     }
 

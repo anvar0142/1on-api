@@ -4,10 +4,12 @@ namespace App\Http\Controllers;
 
 use App\Modules\Auth\Dto\GoogleLoginDto;
 use App\Modules\Auth\Dto\LoginDto;
+use App\Modules\Auth\Dto\SetPhoneDto;
 use App\Modules\Auth\Request\GoogleLoginRequest;
 use App\Modules\Auth\Request\LoginRequest;
 use App\Modules\Auth\Request\LogoutRequest;
 use App\Modules\Auth\Request\RefreshRequest;
+use App\Modules\Auth\Request\SetPhoneLoginRequest;
 use App\Modules\Auth\Service\AuthService;
 use Illuminate\Http\Request;
 
@@ -15,7 +17,7 @@ class AuthController extends Controller
 {
     public function __construct(protected AuthService $loginService)
     {
-        $this->middleware(['jwt.auth'])->except('login', 'google', 'refresh');
+        $this->middleware(['jwt.auth'])->except('login', 'google', 'refresh', 'setPhone');
     }
 
     public function login(LoginRequest $request)
@@ -28,6 +30,12 @@ class AuthController extends Controller
     {
         $googleLoginDto = new GoogleLoginDto($request->validated());
         return $this->loginService->google($googleLoginDto);
+    }
+
+    public function setPhone(SetPhoneLoginRequest $request)
+    {
+        $setPhoneDto = new SetPhoneDto($request);
+        return $this->loginService->setPhone($setPhoneDto);
     }
 
     public function refresh(RefreshRequest $request)

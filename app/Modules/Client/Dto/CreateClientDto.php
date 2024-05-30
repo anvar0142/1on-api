@@ -9,7 +9,7 @@ class CreateClientDto
 
     public function __construct($request)
     {
-        $this->email = $request->email;
-        $this->name = $request->name;
+        $this->email = $request['email'];
+        $this->name = $request['name'];
     }
 }
